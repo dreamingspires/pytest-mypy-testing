@@ -10,7 +10,7 @@ import mypy.api
 import pytest
 from _pytest._code.code import ReprEntry, ReprFileLocation
 from _pytest.config import Config
-
+import re
 from .message import Message, Severity
 from .output_processing import OutputMismatch, diff_message_sequences
 from .parser import MypyTestItem, parse_file
@@ -221,9 +221,8 @@ if PYTEST_VERSION_INFO < (7,):
         return None
 
 else:
-
     def pytest_collect_file(file_path, path, parent):  # type: ignore
-        if path.ext == ".mypy-testing" or _is_pytest_test_file(path, parent):
+        if path.ext == ".mypy-testing" or _is_pytest_test_file(path, parent) or re.compile(r"mypy_.+.py").match(file_path.name):
             file = PytestMypyFile.from_parent(parent=parent, path=file_path)
             if file.mypy_file.items:
                 return file
